@@ -1,0 +1,57 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
+http_archive(
+    name = "bazel_features",
+    sha256 = "ba1282c1aa1d1fffdcf994ab32131d7c7551a9bc960fbf05f42d55a1b930cbfb",
+    strip_prefix = "bazel_features-1.15.0",
+    url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.15.0/bazel_features-v1.15.0.tar.gz",
+)
+
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+bazel_features_deps()
+
+http_archive(
+    name = "rules_foreign_cc",
+    sha256 = "182bfa19c97d902507911d639e25146d2187494b69874b82dadd6c874a488588",
+    strip_prefix = "rules_foreign_cc-6cc82e7528375de83b6ded5dccd6bf32a7501efa",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/6cc82e7528375de83b6ded5dccd6bf32a7501efa.tar.gz",
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+rules_foreign_cc_dependencies(
+    cmake_version = "3.29.3",
+)
+
+_BUILD_FILE_TMPL = """
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "src",
+    srcs = glob(
+        include = ["**"],
+        exclude = [
+            "*.bazel",
+            "WORKSPACE",
+        ],
+    ),
+)
+
+exports_files(glob(
+    exclude_directories=1,
+    include = ["**"],
+    exclude = ["*.bazel"],
+))
+"""
+
+http_archive(
+    name = "cmake",
+    strip_prefix = "cmake-3.29.3",
+    build_file_content = _BUILD_FILE_TMPL,
+    sha256 = "252aee1448d49caa04954fd5e27d189dd51570557313e7b281636716a238bccb",
+    url = "https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3.tar.gz",
+)

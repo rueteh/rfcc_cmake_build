@@ -1,0 +1,11 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+cmake(
+    name = "cmake",
+    lib_source = "@cmake//:src",
+    out_binaries = [
+        "cmake",
+        "cpack",
+        "ctest",
+    ],
+)
